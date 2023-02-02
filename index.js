@@ -25,24 +25,44 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try{
-        const productCollection = client.db('showpieceZone').collection('products');
+        const serviceCollection = client.db('showpieceZone').collection('services');
         const orderCollection = client.db('showpieceZone').collection('orders');
 
 
 
-        app.get('/products', async (req, res) => {
+        app.get('/services', async (req, res) => {
             const query = {}
-            const cursor = productCollection.find(query);
-            const products = await cursor.toArray();
-            res.send(products);
+            const cursor = serviceCollection.find(query);
+            const services = await cursor.toArray();
+            res.send(services);
         });
 
 
-        app.get('/products/:id', async (req, res) => {
+        app.get('/services/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
-            const product = await productCollection.findOne(query);
-            res.send(product);
+            const service = await serviceCollection.findOne(query);
+            res.send(service);
+        });
+
+
+
+        
+        //orders api
+
+        app.get('/orders', async (req, res) => {
+            // console.log(req.query.email);
+            let query = {};
+            if (req.query.email) {
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = orderCollection.find(query);
+            const orders = await cursor.toArray();
+            res.send(orders);
+
+        
         });
 
 
@@ -54,7 +74,16 @@ async function run() {
 
 
 
-        
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
+            res.send(result);
+        })
+
+
+
+
     }
     finally{
 
